@@ -48,12 +48,18 @@ Why those skills are important tome ? A technical tester:
 
 ### I don't want to be a tester!
 
-I remember well an interview with one very honest candidate:\
---- Do you have any questions to us?\
---- Yes. Is there a better job here?\
---- Better than...?\
---- Better than tester.\
---- For instance?\
+I remember well an interview with one very honest candidate:
+
+--- Do you have any questions to us?
+
+--- Yes. Is there a better job here?
+
+--- Better than...?
+
+--- Better than tester.
+
+--- For instance?
+
 --- Manager's job. I would like to become a test manager in a year.
 
 This candidate hasn't demonstrated great technical skills and had unrealistic expectations. It seemed to us that he did not want to be a tester and considered this profession as worse than that of a programmer or a manager.
@@ -99,7 +105,6 @@ I do not claim the survey to be statistically valid. The results can be biased, 
 Take-away message
 -----------------
 
-\
 Having read this post you may ask who actually a technical tester is. I have never clarified that term nor have agreed on it with survey participants but I think the best way to describe such testers is by their skills I have listed in the post. They should be good at progamming, like being a tester and commited to that profession. They should also be able to work closely with a developer in test case design, test automation and bug isolation. They should be creative about inventing test cases and willing to understand how a system under tests works.
 
 And why do you think it is hard to find a technical tester? I'd love to hear what you think about this issue. Let me know in the comments.
