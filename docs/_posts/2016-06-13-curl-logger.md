@@ -5,6 +5,7 @@ date: 2016-06-13 18:00:00 -0000
 categories: testing java
 ---
 
+
 [REST-assured](https://github.com/rest-assured/rest-assured) is a popular Java library that makes testing REST services easier. For the last few months we have used it to automate tests for a complex authentication flow. Large part of tests consisted of multiple REST calls, checking system behaviour in different states. Finding bugs was one challenge but reproducing them was another. Particularly, we struggled with:
 
 * **Bug isolation.** You’re trying to isolate a bug you found in a long test with REST-assured but you don’t want to replay whole scenario over and over. You just want to replay one step and see a HTTP response.
