@@ -1,7 +1,9 @@
+---
 layout: post
 title: "Isolating bugs with REST services"
 date: 2016-06-13 18:00:00 -0000
 categories: testing java
+---
 
 REST-assured is a popular Java library that makes testing REST services easier. For the last few months we have used it to automate tests for a complex authentication flow. Large part of tests consisted of multiple REST calls, checking system behaviour in different states. Finding bugs was one challenge but reproducing them was another. Particularly, we struggled with:
 
