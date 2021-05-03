@@ -28,6 +28,11 @@ Approach
 8. We still can have some shop departments with no products assigned. For each such department select 1 representative product.
 9. Repeat steps 2-5 for products selected in step and 6. We still may have some categories unlabelled but we will stop here.
 
+TODO N1+N2=N, so to split N into N1 and N2? 
+
+Selecting product categories
+============================
+
 
 [1]: https://link.springer.com/content/pdf/10.1007/978-3-642-30284-8_27.pdf
 
