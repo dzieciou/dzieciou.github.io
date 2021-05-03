@@ -7,7 +7,7 @@ categories: NLP ML
 
 I want to assign products to shop departments they can be found in.
 
-Each product belongs to one and only one product category (e.g., ??). Product categories are organized into a taxonomy, there is a hierarchy of product categories. 
+Each product belongs to one and only one product category (e.g., ??). Product categories are organized into a taxonomy, i.e., there is a hierarchy of product categories. 
 
 We assume that all products that (directly) belong to the same category, can be found in the same shop department.
 
