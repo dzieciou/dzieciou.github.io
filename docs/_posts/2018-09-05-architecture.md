@@ -33,6 +33,7 @@ With a library that does only one thing, *fixing bugs and adding new features i
 
 Another benefit of libraries is the *possibility to compose functionalities together*. Imagine, you would like to send an HTTP request to a protected resource requiring authentication. The request fails with an error and your colleagues want to reproduce the problem with curl command line tool. The whole functionality can be achieved by composing three different libraries: REST-assured (for sending HTTP requests), internal authentication library (for authentication and signing HTTP requests with session tokens) and curl logger (for printing curl commands).
 
+```java
 // Authentication library
 Session session = new RestAssuredAuthClient(baseUri).authenticate(user, password);
 
@@ -46,6 +47,7 @@ RestAssured
   .post("/results")
   .then()
   .code(201)
+```
 
 Identifying areas for test libraries
 ====================================
