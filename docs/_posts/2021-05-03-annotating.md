@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Annotating train data with taxnomomies"
+title: "Annotating train data using taxonomy"
 date: 2021-05-03 18:00:00 -0000
 categories: NLP ML
 ---
