@@ -58,14 +58,14 @@ If a library should do only one thing, then you probably ask yourselves what cou
 -   *simulating sub-systems* not available for testing, for instance, a library mocking external Single Sign-On providers like Google Sign-In,
 -   *simulating a user* interacting through GUI or simulating a client application communicating via API, for instance, a library authenticating a user through UI or a library booking a flight through SOAP Web service,
 -   *generating diagnostic information* to help troubleshooting failing tests, for example, a library that prints HTTP requests submitted with HTTP client as curl commands,
--   *detecting certain kinds of error condition*s in a product, for example, a library with assertions checking a state of a user in a database,
+-   *detecting certain kinds of error conditions* in a product, for example, a library with assertions checking a state of a user in a database,
 -   *recording and replaying certain events*, for example, a library recording HTTP traffic from production and replaying it in a test environment.
 
 Note that test libraries can be specific to your product or can have a wider audience. For instance, Selenium library provides a base for interacting with any Web UI, while the Luna Portal reporting library, built on the top of Selenium, provides routines for interacting with UI of our specific system.
 
 How to find potential areas for a testing library in your *current* project? I have learned that this is an organic process. Usually, when the project starts I do not have enough knowledge about the domain and the internals of the system. Automated scripts for testing grow slowly and are frequently refactored as my initial assumptions about the system and the domain often turn out to be wrong.
 
-It is not a bad thing if both test scripts and routines used by those scripts live in the same repository -- it eases frequent refactoring. I try to follow the *rule of three**, *that is when the same code is used three times or more, I extract it into a separate procedure or a helper class. It takes time to understand whether those classes are stable enough to be factored into a separate test library.
+It is not a bad thing if both test scripts and routines used by those scripts live in the same repository -- it eases frequent refactoring. I try to follow the *rule of three*, that is when the same code is used three times or more, I extract it into a separate procedure or a helper class. It takes time to understand whether those classes are stable enough to be factored into a separate test library.
 
 Sharing libraries
 =================
