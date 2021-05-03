@@ -33,8 +33,8 @@ TODO N1+N2=N, so to split N into N1 and N2?
 Selecting categories for labelling
 ==================================
 
-Guessing labels of remaming categories
-======================================
+Guessing labels of remaining categories
+=======================================
 
 
 [1]: https://link.springer.com/content/pdf/10.1007/978-3-642-30284-8_27.pdf
