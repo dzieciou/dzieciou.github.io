@@ -5,7 +5,7 @@ date: 2021-05-03 18:00:00 -0000
 categories: NLP ML
 ---
 
-I want to assign products to shop departments they can be found in.
+My goal is to collect a large dataset of products labelled with shop departments they can be found in. The dataset will be used for training product classifier. 
 
 Each product belongs to one and only one product category (e.g., ??). Product categories are organized into a taxonomy, i.e., there is a hierarchy of product categories. 
 
