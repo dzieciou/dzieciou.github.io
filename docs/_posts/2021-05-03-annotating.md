@@ -1,66 +1,83 @@
 ---
 layout: post
-title: "Annotating train data using mapping between taxonomies"
+title: "Labelling a taxonomy"
 date: 2021-05-03 08:00:00 -0000
 categories: NLP ML
 ---
 
-My ultimate goal is to help shoppers locate a product in a shop. For instance,
-*CIRIO Peeled Tomatoes* product can be found *Tomato Preserves* department in my local shop. 
+Imagine you have a large pile of products, and you want to categorize those products by shop departments they can be found in. This can be a daunting task if you want to do it one by one. However, products live in groups, and often products from the same group can be found in the same department. For instance, Jack Daniel's and Johnnie Walker's whiskies both can be found in the Alcohols department. If we choose and label one product from *each* group manually, we can automatically label the remaining products. This can save us a lot of time and probably money! Especially, if you want to do it for many, many shops: locations of products and available departments vary from one shop to another. 
 
-To train the classifier I need a large dataset of products labelled with shop departments they can be found in. I have collected a large dataset of products from [Frisco.pl](https://www.frisco.pl/). However, they lack labels, so we need to collect them.
+But... did I say labeling *each* group manually? There might still be many more groups than we can label manually. Fortunately,
+groups of products are organized into larger groups, and again, products from those larger groups often tend to be located in the same department. Although, with certain exceptions. For instance, Jack Daniel's whisky and Cabernet Sauvignon wine are in the Alcohols department, but Guinness can be found in my grocery store in a different department, Beers. Even though whiskies, wines, and beers are in the same large group of alcoholic drinks.
 
-Constraints:
+![image-title](/assets/img/tree_1.png){: .center-image }
 
-* We have budget to label only $$n$$ of $$m$$ ($$n \ll m$$) products.
-* Locations of products and available departments vary from one shop to another, so for each shop we will need to label dataset separately.
+So how do you choose products for manual labeling? And how do you infer automated labels from those manual labels?
 
-Fortunately, products from Frisco.pl are organized into categories and there are fewer categories than products. If we assume that products from one category are always located in the same department, then we can save labelling cost and focus on labelling categories rather than single products.
+Formalizing problem
+-------------------
 
-Furthermore, product categories are organized into a taxonomy. Given that departments are also organized in form of a (flat) taxonomy, we can describe labelling task as mapping one taxonomy to another.
+If $$\mathcal{Y}$$ is a set of classes (labels or shop departments in our example), and $$\mathcal{X}$$ is a space of all possible products and product groups, then our goal is to find a classifier function $$f: \mathcal{X} \to \mathcal{Y}$$. This sounds like a [multiclass classification](https://en.wikipedia.org/wiki/Multiclass_classification) problem, although we are not necessarily going to use machine learning to solve it. 
+
+Obviously, we have bent reality a bit assuming that:
+
+* each product can be found only in one department (otherwise that would be [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification)), 
+* and all products can be found in a considered grocery store.
+
+We have the budget to manually label only $$n$$ of $$m$$ products, where $$m=\vert\mathcal{X}\vert$$ and $$n \ll m$$. 
+
+Products are organized in categories that make up a taxonomy $$T$$. More formally, a taxonomy, is a tree, where leaves stand 
+for products and inner nodes are product categories.
+
+Labelling in iterations
+-----------------------
+
+My idea is to label products iteratively.
+
+First iteration is somehow special:
+
+1. Sample $$X_1 \subset \mathcal{X}$$ products.
+2. Label $$X_1$$ manually.
+3. Predict labels for remaining products ($$\mathcal{X} \setminus X_1$$) based on labels for $$X_1$$ and relations in 
+   $$T$$.
+
+There will be products ($$R_1$$) with only one matching label and products ($$S_1$$) with ambiguous predictions, i.e., 
+multiple label candidates, that require manual clarification. In subsequent iterations $$i=2,3,\dots$$ we will gradually 
+clarify those ambiguous predictions:
+
+1. Sample $$X_i \subset S_{i-1}$$ products. 
+2. Label $$X_i$$ manually.
+3. Predict labels for products without manual labels ($$\mathcal{X} \setminus \bigcup_{j=1}^{i}{X_{j}}$$) based on all 
+   manual labels collected so far (i.e. labels for $$\bigcup_{j=1}^{i}{X_{j}}$$) and relations in $$T$$.
+
+Repeat until there are no products with ambiguous predictions ($$\vert S_i \vert = 0$$) or you have consumed whole
+budget ($$\sum_{j=1}^{i}{\vert X_j \vert} \geq n $$). The ultimate labelling will come from both manual labels
+(for $$\bigcup_{j=1}^{i}{X_{j}}$$) and unambiguous predictions (for $$\bigcup_{j=1}^{i}{R_{j}}$$).
+
+Manual labelling
+----------------
+
+Labels are assigned manually to a product in two situations: if the product has not been labelled manually so far or multiple label candidates have been predicted. In the latter case, an annotator can choose from one of predicated candidates or propose a different label.
 
 
 
-Taxonomy mapping problem
-------------------------
+Predicting labels
+-----------------
 
-The problem is well known in the literature (see e.g., ["SCHEMA - An Algorithm for Automated
-Product Taxonomy Mapping in E-commerce"][1] for a sample method or ["Ontology Matching"][2] book for a survey of methods).
+Both product and category nodes in a taxonomy can be labelled. Each can have one or more labels predicted. If a node
+has multiple labels predicted, then we call it ambiguous prediction.
 
-We have access to the following information:
-
-* names of product categories
-* parent/child relationships between product categories
-* names of shop departments
-* names of products belonging to product categories 
+The process of labelling consists of two phases. In first phase we learn labels of all categories based on manual labels of products, moving from leaves to the root of $$T$$. Each inner node of $$T$$ gets a union of labels of its leaves. In second phase we move backwards: each leaf unlabelled so far gets labels of its labelled ancestors.
 
 
+Sampling products for manual labelling
+--------------------------------------
+
+Requirements:
+* Cover all products
+* Cover all labels
 
 
-We are not looking for equivalence between product categories and departments. Instead, we expect departments to be broader than single product categories, because single departments can contain products from multiple product categories.
-
-Approach
---------
-
-The intuition is that if a category have all its children categories labelled with the same
-department, then also that category can be labelled with that department.
-
-The approach is to keep a human in the loop: use annotator to provide initial annotations and resolve possible conflicts in guessed labels.
-
-1. Select $$N_1$$ different product categories that have some products.
-2. For each selected category draw a product.
-3. Label manually each product drawn with a corresponding shop department.
-4. Label automatically categories of labelled products.
-5. Infer automatically labels of ancestors of labelled categories.
-6. The previous step will leave some categories, which lay "in between", unlabelled. Select $$N_2$$ (?) of them.
-7. Repeat steps 2-5 for products selected in step and 6. 
-8. We still can have some shop departments with no products assigned. For each such department select 1 representative product.
-9. Repeat steps 2-5 for products selected in step and 6. We still may have some categories unlabelled, but we will stop here.
-
-TODO $$N1+N2=N$$, so how to split $$N$$ into $$N1$$ and $$N2$$? 
-
-Selecting categories for labelling
-----------------------------------
 
 Given a tree $$T$$, we want to find a subset $$N$$ of $$n$$ leaves that are the farthest apart. I.e., we want to find $$N$$ that maximizes function:
 
@@ -68,6 +85,7 @@ $$g(N)=\sum\limits_{x_1,x_2 \in N}{d(x_1,x_2)}$$
 
 where $$d(x_1, x_2)$$ is a distance between two vertices/nodes $$x_1$$ and $$x_2$$. Now imagine, there is a subtree in $$T$$ with many very deep leaves that are close to each other but very far from leaves in other subtrees of $$T$$. If we defined the distance as just the shortest number of edges between two nodes, then maximizing $$g(N)$$ would lead to solutions where many related categories get selected, e.g. `>Alkohol>Alkohole mocne>Whisky>Szkocka`, `>Alkohol>Alkohole mocne>Whisky>Irlandzka`, `>Alkohol>Alkohole mocne>Whisky>Angielska` rather than `>Alkohol>Alkohole mocne>Whisky>Szkocka`, `Alkohol>Piwo>Piwo bezalkoholowe>Piwo bezalkoholowe` and `Alkohol>Wino>Wino bezalkoholowe>Wino bezalkoholowe`. 
 
+TODO Make a nice picture here
 
 Therefore, we introduce weight $$w$$ to edges that gives more preferences to paths going closer to the root:
 
@@ -78,17 +96,6 @@ where $$x_{i+1}$$ is a child of $$x_i$$. Now
 $$d(x_1, x_m)=\sum\limits_{i=1}^{m-1}{w(x_i,x_{i+1})}$$  
 
 where $$x_1, x_2, ..., x_m$$ is a walk (sequence of nodes).
-
-Guessing labels of remaining categories
----------------------------------------
-
-
-If a product belong both to a product category and shop department, then product category is *part of* that department.
-
-If a product category is *part of* a certain department, then also its parent category is *part of* that department, unless any of *sibling* category is *part of* another department.
-
-TODO Alogirthm, let $$D(l)$$ denote the department of the product category of a leaf $$l$$. For each leaf $$l$$, move upwards and mark each node with $$D(l)$$. If you hit a node already marked $$D(l)$$, you move on to the next leaf. If you hit a node marked with a different color, umark the node.
-
 
 Finding farthest leaves in a tree
 ---------------------------------
@@ -115,6 +122,55 @@ $$A$$ can be calculated by traversing $$T$$ in post order.
 
 If we have an arbitrary tree, not necessarily a binary tree, then it can be converted to a binary tree as follows. Children from the original tree are encoded as a left child in the binary tree and edges to left children preserve their original weights. Remaining edges, those to right children, have 0 weight. TODO Add an image.
 
+
+
+
+
+Distributing labelling budget
+-----------------------------
+
+We have one annotator, predicting next label costs nothing (compared to manual cost), so given a budget $$n$$, so we can have $$n$$ iterations, in each we select only one product for manual labelling.
+
+The problem then boils down, which product to select next?
+- The one that resolves most conflicts: products with the highest number of label candidates?
+- Or on the contrary: 
+  
+  > "In contrast, for an ambiguous instance which falls near the boundary of categories, even
+those reliable workers will still disagree with each other and generate inconsistent labels.
+For those ambiguous instances, we are facing a challenging decision problem on how much
+budget that we should spend on them. On one hand, it is worth to collect more labels to
+boost the accuracy of the aggregate label. On the other hand, since our goal is to maximize
+the overall labeling accuracy, when the budget is limited, we should simply put those few
+highly ambiguous instances aside to save budget for labeling less difficult instances." 
+
+Quote form [Statistical Decision Making for Optimal Budget Allocation in Crowd Labeling](https://www.jmlr.org/papers/volume16/chen15a/chen15a.pdf)
+
+Technically, the number of conflicting labels could be included in the weight function.
+
+However, if in the first iteration we select only one item to label then all remaining items will get same label (which might be incorrect). In the begining we want to find items matching possibly all label classes. 
+
+Also, conflicts are good because they lead to clarification. 
+
+TODO:
+- Experiment with current implementation to get some intuitions on budget allocation, number of iterations, when conflicts are good.
+- If we don't have groundtruth labels, how do we know what is an optimal labelling, how to measure it? How they evaluated that in the paper?
+
+
+Evaluation
+----------
+
+I have collected a large dataset of products from [Frisco.pl](https://www.frisco.pl/) and I want to group them by deparments of my local grocery shop. For instance, *CIRIO Peeled Tomatoes* product can be found *Tomato Preserves* department in my local shop. 
+
+Further reading
+---------------
+
+The problem we are tackling here is similar to taxonomy mapping. See ["SCHEMA - An Algorithm for Automated
+Product Taxonomy Mapping in E-commerce"][1] for a sample method on that or ["Ontology Matching"][2] book for a survey of taxonomy mapping methods.
+
+Acknowledgements
+----------------
+
+I would like to thank people from StackExchange for help in developing algorithms, my girlfriend Renata for help in mapping our local grocery store and my work mates for feedback during Lighting Talks.
 
 [1]: https://link.springer.com/content/pdf/10.1007/978-3-642-30284-8_27.pdf
 [2]: http://www.filosofiacienciaarte.org/attachments/article/1129/Je%CC%81ro%CC%82me%20Euzenat-Ontology%20Matching.pdf
