@@ -1,8 +1,4 @@
-# Maciej Gawinecki, Ph.D.
-
-This is my personal Web page content.
-
-# Project
+# Projects
 
 * [**curl-logger**](https://github.com/dzieciou/curl-logger): Java library to log HTTP requests sent by REST-assured as CURL commands.
 * [**pystempel**](https://github.com/dzieciou/pystempel): Python port of Stempel, an algorithmic stemmer for Polish language, originally written in Java.
